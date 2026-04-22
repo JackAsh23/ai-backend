@@ -3,24 +3,15 @@ const cors = require("cors");
 
 const app = express();
 
-// ✅ USE CORS LIBRARY (IMPORTANT)
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"]
-}));
-
-// ✅ HANDLE PREFLIGHT (VERY IMPORTANT)
-app.options("*", cors());
-
+app.use(cors());
 app.use(express.json());
 
-// ✅ TEST ROUTE (so /ai won't show Not Found anymore)
+// ✅ TEST ROUTE
 app.get("/", (req, res) => {
-    res.send("AI Backend is running 🚀");
+    res.send("Gemini Backend Running 🚀");
 });
 
-// ✅ AI ROUTE
+// ✅ GEMINI AI ROUTE
 app.post("/ai", async (req, res) => {
 
     const { faculty, facility } = req.body;
@@ -32,37 +23,51 @@ Facility Issue: ${facility}
 Give:
 1. Faculty recommendation
 2. Facility recommendation
-3. Overall performance summary
+2. Overall performance summary
 `;
 
     try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages: [{ role: "user", content: prompt }]
-            })
-        });
+        const response = await fetch(
+            "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + process.env.GEMINI_API_KEY,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }]
+                })
+            }
+        );
 
         const data = await response.json();
-        res.json(data);
 
-    } catch (err) {
-        console.error(err);
+        // ✅ FORMAT LIKE OPENAI (so no frontend changes needed)
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+
         res.json({
             choices: [{
                 message: {
-                    content: "⚠️ AI temporarily unavailable."
+                    content: text
+                }
+            }]
+        });
+
+    } catch (err) {
+        console.error(err);
+
+        res.json({
+            choices: [{
+                message: {
+                    content: "⚠️ Gemini AI error."
                 }
             }]
         });
     }
 });
 
-// ✅ PORT FIX (RENDER REQUIREMENT)
+// ✅ PORT FIX
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on port", PORT));
+app.listen(PORT, () => console.log("Server running"));
