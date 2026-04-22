@@ -18,37 +18,48 @@ app.post("/ai", async (req, res) => {
     const { faculty, facility } = req.body;
 
     const prompt = `
-Faculty Issue: ${faculty}
-Facility Issue: ${facility}
+You are analyzing student survey results.
+
+Faculty Issue: ${faculty || "No major issue detected"}
+Facility Issue: ${facility || "No major issue detected"}
 
 Give:
-1. Faculty recommendation
-2. Facility recommendation
-3. Overall performance summary
+1. Faculty Recommendation
+2. Facility Recommendation
+3. Overall Performance Summary
 `;
 
     try {
         const response = await fetch(
-  "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=" + process.env.GEMINI_API_KEY,
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + process.env.GEMINI_API_KEY,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: prompt }]
-                    }]
+                    contents: [
+                        {
+                            parts: [
+                                { text: prompt }
+                            ]
+                        }
+                    ]
                 })
             }
         );
 
         const data = await response.json();
 
-        console.log("GEMINI RESPONSE:", data);
+        console.log("GEMINI RESPONSE:", JSON.stringify(data, null, 2));
 
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text 
-            || "⚠️ Gemini returned no data.";
+        let text = "⚠️ No AI response.";
+
+        if (data.candidates && data.candidates.length > 0) {
+            text = data.candidates[0].content?.parts?.[0]?.text || text;
+        } else if (data.error) {
+            text = "⚠️ Gemini Error: " + data.error.message;
+        }
 
         res.json({
             choices: [{
