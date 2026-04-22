@@ -3,11 +3,13 @@ const cors = require("cors");
 
 const app = express();
 
+// 🔥 SUPER SAFE CORS (handles EVERYTHING)
 app.use(cors({
     origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"]
 }));
+
+// 🔥 IMPORTANT: HANDLE PREFLIGHT
+app.options("*", cors());
 
 app.use(express.json());
 
