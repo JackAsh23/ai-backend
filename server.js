@@ -28,7 +28,7 @@ Give:
 
     try {
         const response = await fetch(
-            "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" + process.env.GEMINI_API_KEY,
+            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent" + process.env.GEMINI_API_KEY,
             {
                 method: "POST",
                 headers: {
@@ -45,7 +45,12 @@ Give:
         const data = await response.json();
 
         // ✅ FORMAT LIKE OPENAI (so no frontend changes needed)
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+        if (!data.candidates) {
+    console.log("GEMINI ERROR:", data);
+}
+
+const text = data.candidates?.[0]?.content?.parts?.[0]?.text 
+    || "⚠️ Gemini returned no data.";
 
         res.json({
             choices: [{
