@@ -76,3 +76,11 @@ const text = data.candidates?.[0]?.content?.parts?.[0]?.text
 // ✅ PORT FIX
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server running"));
+
+const data = await response.json();
+
+console.log("GEMINI RESPONSE:", data); // 👈 ADD THIS
+
+if (!data.candidates) {
+    console.log("GEMINI ERROR FULL:", data);
+}
