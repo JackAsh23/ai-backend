@@ -3,13 +3,18 @@ const cors = require("cors");
 
 const app = express();
 
-// 🔥 SUPER SAFE CORS (handles EVERYTHING)
-app.use(cors({
-    origin: "*",
-}));
+// ✅ STRONG CORS FIX
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
 
-// 🔥 IMPORTANT: HANDLE PREFLIGHT
-app.options("*", cors());
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
 
 app.use(express.json());
 
@@ -44,10 +49,12 @@ Give:
         res.json(data);
 
     } catch (err) {
+        console.error(err);
+
         res.json({
             choices: [{
                 message: {
-                    content: "AI temporarily unavailable."
+                    content: "⚠️ AI temporarily unavailable."
                 }
             }]
         });
