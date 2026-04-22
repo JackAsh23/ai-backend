@@ -1,22 +1,26 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-// 🔥 HARD CORS FIX (MANUAL — GUARANTEED)
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+// ✅ USE CORS LIBRARY (IMPORTANT)
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
+}));
 
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
-
-    next();
-});
+// ✅ HANDLE PREFLIGHT (VERY IMPORTANT)
+app.options("*", cors());
 
 app.use(express.json());
 
+// ✅ TEST ROUTE (so /ai won't show Not Found anymore)
+app.get("/", (req, res) => {
+    res.send("AI Backend is running 🚀");
+});
+
+// ✅ AI ROUTE
 app.post("/ai", async (req, res) => {
 
     const { faculty, facility } = req.body;
@@ -48,8 +52,7 @@ Give:
         res.json(data);
 
     } catch (err) {
-        console.error("ERROR:", err);
-
+        console.error(err);
         res.json({
             choices: [{
                 message: {
@@ -60,7 +63,6 @@ Give:
     }
 });
 
-// 🔥 IMPORTANT: USE PORT FROM RENDER
+// ✅ PORT FIX (RENDER REQUIREMENT)
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => console.log("Server running on port", PORT));
