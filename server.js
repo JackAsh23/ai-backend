@@ -1,3 +1,18 @@
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+
+// ✅ MIDDLEWARE
+app.use(cors());
+app.use(express.json());
+
+// ✅ TEST ROUTE
+app.get("/", (req, res) => {
+    res.send("Gemini Backend Running 🚀");
+});
+
+// ✅ AI ROUTE
 app.post("/ai", async (req, res) => {
 
     const { faculty, facility } = req.body;
@@ -30,6 +45,8 @@ Give:
 
         const data = await response.json();
 
+        console.log("GEMINI RESPONSE:", data);
+
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text 
             || "⚠️ Gemini returned no data.";
 
@@ -42,7 +59,7 @@ Give:
         });
 
     } catch (err) {
-        console.error(err);
+        console.error("AI ERROR:", err);
 
         res.json({
             choices: [{
@@ -52,4 +69,11 @@ Give:
             }]
         });
     }
+});
+
+// ✅ PORT (RENDER REQUIRED)
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log("Server running on port", PORT);
 });
