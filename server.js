@@ -18,7 +18,9 @@ app.post("/ai", async (req, res) => {
     const { faculty, facility, comments } = req.body;
 
 const prompt = `
-You are analyzing student feedback.
+You are analyzing student feedback for a university system.
+
+Even if no major issues are detected, you must still provide constructive insights and recommendations.
 
 Faculty Issue: ${faculty}
 Facility Issue: ${facility}
@@ -28,12 +30,13 @@ ${comments.join("\n")}
 
 Provide:
 
-1. Faculty Insight
-2. Facility Insight
-3. Overall Summary
+1. Faculty Insight (always give at least 1 improvement suggestion)
+2. Facility Insight (always give at least 1 improvement suggestion)
+3. Overall Summary (analyze general performance)
 4. Sentiment Breakdown (Positive %, Neutral %, Negative %)
 
-Keep it short and clear.
+Do NOT say "no issue". Always give helpful recommendations.
+Keep answers short and clear.
 `;
 
     try {
