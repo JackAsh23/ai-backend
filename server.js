@@ -15,18 +15,25 @@ app.get("/", (req, res) => {
 // ✅ AI ROUTE
 app.post("/ai", async (req, res) => {
 
-    const { faculty, facility } = req.body;
+    const { faculty, facility, comments } = req.body;
 
-    const prompt = `
-You are analyzing student survey results.
+const prompt = `
+You are analyzing student feedback.
 
-Faculty Issue: ${faculty || "No major issue detected"}
-Facility Issue: ${facility || "No major issue detected"}
+Faculty Issue: ${faculty}
+Facility Issue: ${facility}
 
-Give:
-1. Faculty Recommendation
-2. Facility Recommendation
-3. Overall Performance Summary
+Comments:
+${comments.join("\n")}
+
+Provide:
+
+1. Faculty Insight
+2. Facility Insight
+3. Overall Summary
+4. Sentiment Breakdown (Positive %, Neutral %, Negative %)
+
+Keep it short and clear.
 `;
 
     try {
