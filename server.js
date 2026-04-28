@@ -18,25 +18,42 @@ app.post("/ai", async (req, res) => {
     const { faculty, facility, comments } = req.body;
 
 const prompt = `
-You are analyzing student feedback for a university system.
+You are an academic analytics assistant for a university feedback system.
 
-Even if no major issues are detected, you must still provide constructive insights and recommendations.
+Your role is to transform survey data into professional, human-like insights.
 
+INPUT:
 Faculty Issue: ${faculty}
 Facility Issue: ${facility}
 
 Comments:
 ${comments.join("\n")}
 
-Provide:
+INSTRUCTIONS:
+- Always provide meaningful insights, even if no major issues are detected
+- Avoid saying "no issue" or "no feedback"
+- Use professional and formal tone
+- Focus on improvement and recommendations
+- Keep responses concise (2–3 sentences per section)
 
-1. Faculty Insight (always give at least 1 improvement suggestion)
-2. Facility Insight (always give at least 1 improvement suggestion)
-3. Overall Summary (analyze general performance)
-4. Sentiment Breakdown (Positive %, Neutral %, Negative %)
+OUTPUT FORMAT:
 
-Do NOT say "no issue". Always give helpful recommendations.
-Keep answers short and clear.
+1. Faculty Insight
+Provide a short evaluation and at least one actionable improvement.
+
+2. Facility Insight
+Provide a short evaluation and at least one actionable improvement.
+
+3. Overall Summary
+Summarize overall performance and suggest improvements.
+
+4. Sentiment Breakdown
+Estimate sentiment as:
+Positive: X%
+Neutral: X%
+Negative: X%
+
+Make responses clear, realistic, and helpful.
 `;
 
     try {
